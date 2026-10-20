@@ -4,8 +4,8 @@
 /// A hot potato that walks a release's tracklist in order, one track at a
 /// time. Each step is a separate PTB command, so a consumer can make a typed
 /// call per track (e.g. into each recording's pool). Only the package that
-/// defines `W` can advance or finish an iterator, and `finish` requires every
-/// track to have been visited.
+/// defines `W` can start, advance or finish an iterator, and `finish` requires
+/// every track to have been visited.
 module release_track_iterator::release_track_iterator;
 
 // === Imports ===
