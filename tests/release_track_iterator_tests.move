@@ -4,17 +4,23 @@
 #[test_only]
 module release_track_iterator::release_track_iterator_tests;
 
-use std::unit_test::destroy;
+use std::unit_test::{assert_eq, destroy};
 use sui::address;
 use musicos::release::{Self, Release};
 use release_track_iterator::release_track_iterator;
 
 public struct Witness() has drop;
+public struct OtherWitness() has drop;
 
 fun release(n: u64, ctx: &mut TxContext): (Release, vector<ID>) {
     let release_id = object::id_from_address(@0xbeef);
-    let recording_ids = vector::tabulate!(n, |i| object::id_from_address(address::from_u256((i + 1) as u256)));
-    let consents = recording_ids.map_ref!(|id| release::consent_for_testing(*id, release_id));
+    let recording_ids = vector::tabulate!(
+        n,
+        |i| object::id_from_address(address::from_u256((i + 1) as u256)),
+    );
+    let consents = recording_ids.map_ref!(
+        |id| release::consent_for_testing(*id, release_id),
+    );
     let (release, cap) = release::new_for_testing(consents, ctx);
     destroy(cap);
     (release, recording_ids)
@@ -25,14 +31,14 @@ fun visits_every_track_in_order() {
     let mut ctx = tx_context::dummy();
     let (release, recording_ids) = release(3, &mut ctx);
     let mut tracks = release_track_iterator::new(Witness(), &release);
-    assert!(tracks.release_id() == object::id(&release));
+    assert_eq!(tracks.release_id(), object::id(&release));
 
     recording_ids.length().do!(|i| {
-        assert!(tracks.position() == i);
-        assert!(tracks.remaining() == 3 - i);
-        assert!(tracks.next(Witness()) == recording_ids[i]);
+        assert_eq!(tracks.position(), i);
+        assert_eq!(tracks.remaining(), 3 - i);
+        assert_eq!(tracks.next(Witness()), recording_ids[i]);
     });
-    assert!(tracks.remaining() == 0);
+    assert_eq!(tracks.remaining(), 0);
     tracks.finish(Witness());
     destroy(release);
 }
@@ -55,5 +61,82 @@ fun next_past_last_track_aborts() {
     tracks.next(Witness());
     tracks.next(Witness());
     tracks.finish(Witness());
+    destroy(release);
+}
+
+#[test]
+fun empty_release_finishes_immediately() {
+    let mut ctx = tx_context::dummy();
+    let (release, _) = release(0, &mut ctx);
+    let tracks = release_track_iterator::new(Witness(), &release);
+    assert_eq!(tracks.remaining(), 0);
+    tracks.finish(Witness());
+    destroy(release);
+}
+
+#[test, expected_failure(abort_code = release_track_iterator::ENoTracksRemaining)]
+fun next_on_empty_release_aborts() {
+    let mut ctx = tx_context::dummy();
+    let (release, _) = release(0, &mut ctx);
+    let mut tracks = release_track_iterator::new(Witness(), &release);
+    tracks.next(Witness());
+    tracks.finish(Witness());
+    destroy(release);
+}
+
+#[test, expected_failure(abort_code = release_track_iterator::ETracksRemaining)]
+fun finish_before_any_track_aborts() {
+    let mut ctx = tx_context::dummy();
+    let (release, _) = release(2, &mut ctx);
+    let tracks = release_track_iterator::new(Witness(), &release);
+    tracks.finish(Witness());
+    destroy(release);
+}
+
+#[test]
+fun single_track_release() {
+    let mut ctx = tx_context::dummy();
+    let (release, recording_ids) = release(1, &mut ctx);
+    let mut tracks = release_track_iterator::new(Witness(), &release);
+    assert_eq!(tracks.next(Witness()), recording_ids[0]);
+    assert_eq!(tracks.position(), 1);
+    assert_eq!(tracks.remaining(), 0);
+    tracks.finish(Witness());
+    destroy(release);
+}
+
+#[test]
+fun walks_a_max_tracks_release() {
+    let mut ctx = tx_context::dummy();
+    let max = release::max_tracks();
+    let (release, recording_ids) = release(max, &mut ctx);
+    let mut tracks = release_track_iterator::new(Witness(), &release);
+    max.do!(|i| {
+        assert_eq!(tracks.position(), i);
+        assert_eq!(tracks.next(Witness()), recording_ids[i]);
+    });
+    assert_eq!(tracks.remaining(), 0);
+    tracks.finish(Witness());
+    destroy(release);
+}
+
+#[test]
+fun iterators_with_different_witnesses_advance_independently() {
+    let mut ctx = tx_context::dummy();
+    let (release, recording_ids) = release(3, &mut ctx);
+    let mut first = release_track_iterator::new(Witness(), &release);
+    let mut second = release_track_iterator::new(OtherWitness(), &release);
+
+    assert_eq!(first.next(Witness()), recording_ids[0]);
+    assert_eq!(first.next(Witness()), recording_ids[1]);
+    assert_eq!(second.next(OtherWitness()), recording_ids[0]);
+    assert_eq!(first.position(), 2);
+    assert_eq!(second.position(), 1);
+    assert_eq!(first.next(Witness()), recording_ids[2]);
+    assert_eq!(second.next(OtherWitness()), recording_ids[1]);
+    assert_eq!(second.next(OtherWitness()), recording_ids[2]);
+
+    first.finish(Witness());
+    second.finish(OtherWitness());
     destroy(release);
 }

@@ -4,7 +4,7 @@ A hot potato that walks a release's tracklist in order, one track per PTB comman
 
 **Layer:** `move/lib`, a primitive that packages build on. It isn't part of the core protocol and isn't an extension.
 
-`ReleaseTrackIterator<W>` is parameterized by a witness type. Only the package that defines `W` can advance or finish an iterator, so a PTB can't skip a track or end iteration outside that package's own checks. `finish` aborts unless every track was visited, and the iterator has no abilities, so it can't be dropped or stored.
+`ReleaseTrackIterator<W>` is parameterized by a witness type. An iterator over a consumer's witness type `W` can only be started, advanced and finished by `W`'s defining module, so a PTB can't skip a track or end iteration outside that module's own checks. `finish` aborts unless every track was visited, and the iterator has no abilities, so it can't be dropped or stored.
 
 ## API
 

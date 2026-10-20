@@ -3,9 +3,9 @@
 
 /// A hot potato that walks a release's tracklist in order, one track at a
 /// time. Each step is a separate PTB command, so a consumer can make a typed
-/// call per track (e.g. into each recording's pool). Only the package that
-/// defines `W` can start, advance or finish an iterator, and `finish` requires
-/// every track to have been visited.
+/// call per track (e.g. into each recording's pool). Only `W`'s defining module
+/// can start, advance or finish an iterator, and `finish` requires every track
+/// to have been visited.
 module release_track_iterator::release_track_iterator;
 
 // === Imports ===
@@ -14,11 +14,12 @@ use musicos::release::Release;
 
 // === Errors ===
 
-const ETracksRemaining: u64 = 0;
-const ENoTracksRemaining: u64 = 1;
+const ENoTracksRemaining: u64 = 0;
+const ETracksRemaining: u64 = 1;
 
 // === Structs ===
 
+/// A walk over one release's tracklist for witness type `W`; no abilities.
 public struct ReleaseTrackIterator<phantom W> {
     release_id: ID,
     recording_ids: vector<ID>,
@@ -28,6 +29,7 @@ public struct ReleaseTrackIterator<phantom W> {
 
 // === Public Functions ===
 
+/// Starts an iterator at the release's first track.
 public fun new<W: drop>(_: W, release: &Release): ReleaseTrackIterator<W> {
     ReleaseTrackIterator {
         release_id: object::id(release),
@@ -52,14 +54,17 @@ public fun finish<W: drop>(self: ReleaseTrackIterator<W>, _: W) {
 
 // === View Functions ===
 
+/// The release being walked.
 public fun release_id<W>(self: &ReleaseTrackIterator<W>): ID {
     self.release_id
 }
 
+/// Index of the next track; also the number of tracks visited.
 public fun position<W>(self: &ReleaseTrackIterator<W>): u64 {
     self.position
 }
 
+/// The number of tracks not yet visited.
 public fun remaining<W>(self: &ReleaseTrackIterator<W>): u64 {
     self.recording_ids.length() - self.position
 }
