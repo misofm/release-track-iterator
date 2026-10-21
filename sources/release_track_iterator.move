@@ -1,11 +1,6 @@
 // Copyright (c) Miso Labs, Inc.
 // SPDX-License-Identifier: FSL-1.1-ALv2
 
-/// A hot potato that walks a release's tracklist in order, one track at a
-/// time. Each step is a separate PTB command, so a consumer can make a typed
-/// call per track (e.g. into each recording's pool). Only `Witness`'s defining
-/// module can start, advance or finish an iterator, and `finish` requires every
-/// track to have been visited.
 module release_track_iterator::release_track_iterator;
 
 // === Imports ===
@@ -22,7 +17,6 @@ const ETracksRemaining: u64 = 1;
 public struct ReleaseTrackIterator<phantom Witness> {
     release_id: ID,
     recording_ids: vector<ID>,
-    /// Index of the next track; also the number of tracks visited.
     position: u64,
 }
 
@@ -54,7 +48,6 @@ public fun release_id<Witness>(self: &ReleaseTrackIterator<Witness>): ID {
     self.release_id
 }
 
-/// Also the number of tracks visited.
 public fun position<Witness>(self: &ReleaseTrackIterator<Witness>): u64 {
     self.position
 }
