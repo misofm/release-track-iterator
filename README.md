@@ -4,13 +4,13 @@ A hot potato that walks a release's tracklist in order, one track per PTB comman
 
 **Layer:** `move/lib`, a primitive that packages build on. It isn't part of the core protocol and isn't an extension.
 
-`ReleaseTrackIterator<W>` is parameterized by a witness type. An iterator over a consumer's witness type `W` can only be started, advanced and finished by `W`'s defining module, so a PTB can't skip a track or end iteration outside that module's own checks. `finish` aborts unless every track was visited, and the iterator has no abilities, so it can't be dropped or stored.
+`ReleaseTrackIterator<Witness>` is parameterized by a witness type. An iterator over a consumer's witness type `Witness` can only be started, advanced and finished by `Witness`'s defining module, so a PTB can't skip a track or end iteration outside that module's own checks. `finish` aborts unless every track was visited, and the iterator has no abilities, so it can't be dropped or stored.
 
 ## API
 
-- **`new<W>(release, W)`** starts at the first track.
-- **`next<W>(self, W)`** returns the next track's recording ID. Aborts after the last track.
-- **`finish<W>(self, W)`** consumes the iterator. Aborts unless every track was visited.
+- **`new<Witness>(release, Witness)`** starts at the first track.
+- **`next<Witness>(self, Witness)`** returns the next track's recording ID. Aborts after the last track.
+- **`finish<Witness>(self, Witness)`** consumes the iterator. Aborts unless every track was visited.
 - **`release_id`**, **`position`** (the index of the next track) and **`remaining`** are views.
 
 A consumer usually wraps the iterator in its own hot potato, next to whatever state each step needs:
