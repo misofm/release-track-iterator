@@ -6,7 +6,7 @@ module release_track_iterator::release_track_iterator_tests;
 
 use std::unit_test::{assert_eq, destroy};
 use sui::address;
-use musicos::release::{Self, Release};
+use miso_music::release::{Self, Release};
 use release_track_iterator::release_track_iterator;
 
 public struct Witness() has drop;

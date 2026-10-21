@@ -10,7 +10,7 @@ module release_track_iterator::release_track_iterator;
 
 // === Imports ===
 
-use musicos::release::Release;
+use miso_music::release::Release;
 
 // === Errors ===
 

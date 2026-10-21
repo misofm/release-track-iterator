@@ -26,7 +26,7 @@ public struct Distribution<phantom Currency> {
 
 ## Dependencies
 
-- **`musicos`**: core protocol. `Release` is read once, by `new`, to copy the tracklist.
+- **`miso_music`**: the music protocol (`misofm/music-protocol`). `Release` is read once, by `new`, to copy the tracklist.
 
 ## Build & test
 
