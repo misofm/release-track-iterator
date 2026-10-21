@@ -19,7 +19,6 @@ const ETracksRemaining: u64 = 1;
 
 // === Structs ===
 
-/// A walk over one release's tracklist for witness type `W`; no abilities.
 public struct ReleaseTrackIterator<phantom W> {
     release_id: ID,
     recording_ids: vector<ID>,
@@ -29,7 +28,6 @@ public struct ReleaseTrackIterator<phantom W> {
 
 // === Public Functions ===
 
-/// Starts an iterator at the release's first track.
 public fun new<W: drop>(_: W, release: &Release): ReleaseTrackIterator<W> {
     ReleaseTrackIterator {
         release_id: object::id(release),
@@ -38,7 +36,6 @@ public fun new<W: drop>(_: W, release: &Release): ReleaseTrackIterator<W> {
     }
 }
 
-/// Returns the next track's recording ID.
 public fun next<W: drop>(self: &mut ReleaseTrackIterator<W>, _: W): ID {
     assert!(self.position < self.recording_ids.length(), ENoTracksRemaining);
     let recording_id = self.recording_ids[self.position];
@@ -46,7 +43,6 @@ public fun next<W: drop>(self: &mut ReleaseTrackIterator<W>, _: W): ID {
     recording_id
 }
 
-/// Consumes the iterator. Aborts unless every track was visited.
 public fun finish<W: drop>(self: ReleaseTrackIterator<W>, _: W) {
     let ReleaseTrackIterator { recording_ids, position, .. } = self;
     assert!(position == recording_ids.length(), ETracksRemaining);
@@ -54,17 +50,15 @@ public fun finish<W: drop>(self: ReleaseTrackIterator<W>, _: W) {
 
 // === View Functions ===
 
-/// The release being walked.
 public fun release_id<W>(self: &ReleaseTrackIterator<W>): ID {
     self.release_id
 }
 
-/// Index of the next track; also the number of tracks visited.
+/// Also the number of tracks visited.
 public fun position<W>(self: &ReleaseTrackIterator<W>): u64 {
     self.position
 }
 
-/// The number of tracks not yet visited.
 public fun remaining<W>(self: &ReleaseTrackIterator<W>): u64 {
     self.recording_ids.length() - self.position
 }
