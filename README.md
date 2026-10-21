@@ -8,7 +8,7 @@ A hot potato that walks a release's tracklist in order, one track per PTB comman
 
 ## API
 
-- **`new<W>(W, release)`** starts at the first track.
+- **`new<W>(release, W)`** starts at the first track.
 - **`next<W>(self, W)`** returns the next track's recording ID. Aborts after the last track.
 - **`finish<W>(self, W)`** consumes the iterator. Aborts unless every track was visited.
 - **`release_id`**, **`position`** (the index of the next track) and **`remaining`** are views.

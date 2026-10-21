@@ -28,7 +28,7 @@ public struct ReleaseTrackIterator<phantom W> {
 
 // === Public Functions ===
 
-public fun new<W: drop>(_: W, release: &Release): ReleaseTrackIterator<W> {
+public fun new<W: drop>(release: &Release, _: W): ReleaseTrackIterator<W> {
     ReleaseTrackIterator {
         release_id: object::id(release),
         recording_ids: *release.recording_ids(),
