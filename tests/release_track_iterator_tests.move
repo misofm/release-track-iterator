@@ -30,8 +30,8 @@ fun visits_every_track_in_order() {
     assert_eq!(tracks.release_id(), object::id(&release));
 
     recording_ids.length().do!(|i| {
-        assert_eq!(tracks.position(), i);
-        assert_eq!(tracks.remaining(), 3 - i);
+        assert_eq!(tracks.position() as u64, i);
+        assert_eq!(tracks.remaining() as u64, 3 - i);
         assert_eq!(tracks.next(Witness()), recording_ids[i]);
     });
     assert_eq!(tracks.remaining(), 0);
@@ -108,7 +108,7 @@ fun walks_a_max_tracks_release() {
     let (release, recording_ids) = release(max, &mut ctx);
     let mut tracks = release_track_iterator::new(&release, Witness());
     max.do!(|i| {
-        assert_eq!(tracks.position(), i);
+        assert_eq!(tracks.position() as u64, i);
         assert_eq!(tracks.next(Witness()), recording_ids[i]);
     });
     assert_eq!(tracks.remaining(), 0);

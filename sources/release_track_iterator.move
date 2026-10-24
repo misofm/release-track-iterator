@@ -17,7 +17,7 @@ const ETracksRemaining: u64 = 1;
 public struct ReleaseTrackIterator<phantom Witness> {
     release_id: ID,
     tracks: vector<Track>,
-    position: u64,
+    position: u8,
 }
 
 // === Public Functions ===
@@ -31,15 +31,15 @@ public fun new<Witness: drop>(release: &Release, _: Witness): ReleaseTrackIterat
 }
 
 public fun next<Witness: drop>(self: &mut ReleaseTrackIterator<Witness>, _: Witness): ID {
-    assert!(self.position < self.tracks.length(), ENoTracksRemaining);
-    let recording_id = self.tracks[self.position].recording_id();
+    assert!((self.position as u64) < self.tracks.length(), ENoTracksRemaining);
+    let recording_id = self.tracks[self.position as u64].recording_id();
     self.position = self.position + 1;
     recording_id
 }
 
 public fun finish<Witness: drop>(self: ReleaseTrackIterator<Witness>, _: Witness) {
     let ReleaseTrackIterator { tracks, position, .. } = self;
-    assert!(position == tracks.length(), ETracksRemaining);
+    assert!((position as u64) == tracks.length(), ETracksRemaining);
 }
 
 // === View Functions ===
@@ -48,10 +48,10 @@ public fun release_id<Witness>(self: &ReleaseTrackIterator<Witness>): ID {
     self.release_id
 }
 
-public fun position<Witness>(self: &ReleaseTrackIterator<Witness>): u64 {
+public fun position<Witness>(self: &ReleaseTrackIterator<Witness>): u8 {
     self.position
 }
 
-public fun remaining<Witness>(self: &ReleaseTrackIterator<Witness>): u64 {
-    self.tracks.length() - self.position
+public fun remaining<Witness>(self: &ReleaseTrackIterator<Witness>): u8 {
+    (self.tracks.length() as u8) - self.position
 }

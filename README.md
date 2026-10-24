@@ -11,7 +11,7 @@ A hot potato that walks a release's tracklist in order, one track per PTB comman
 - **`new<Witness>(release, Witness)`** starts at the first track.
 - **`next<Witness>(self, Witness)`** returns the next track's recording ID. Aborts after the last track.
 - **`finish<Witness>(self, Witness)`** consumes the iterator. Aborts unless every track was visited.
-- **`release_id`**, **`position`** (the index of the next track) and **`remaining`** are views.
+- **`release_id`**, **`position`** (the index of the next track) and **`remaining`** are views. Positions and counts are `u8`, since a release holds at most 255 tracks.
 
 A consumer usually wraps the iterator in its own hot potato, next to whatever state each step needs:
 
