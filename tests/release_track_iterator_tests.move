@@ -13,15 +13,11 @@ public struct Witness() has drop;
 public struct OtherWitness() has drop;
 
 fun release(n: u64, ctx: &mut TxContext): (Release, vector<ID>) {
-    let release_id = object::id_from_address(@0xbeef);
     let recording_ids = vector::tabulate!(
         n,
         |i| object::id_from_address(address::from_u256((i + 1) as u256)),
     );
-    let consents = recording_ids.map_ref!(
-        |id| release::consent_for_testing(*id, release_id),
-    );
-    let (release, cap) = release::new_for_testing(consents, ctx);
+    let (release, cap) = release::new_for_testing(recording_ids, ctx);
     destroy(cap);
     (release, recording_ids)
 }
